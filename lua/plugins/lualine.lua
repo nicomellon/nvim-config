@@ -8,7 +8,6 @@ return {
       return {
         options = {
           theme = "auto",
-          globalstatus = true,
         },
         sections = {
           lualine_a = { "mode" },

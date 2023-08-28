@@ -18,6 +18,9 @@ return {
       -- git
       { "<leader>gc", "<cmd>Telescope git_commits<CR>", desc = "commits" },
       { "<leader>gs", "<cmd>Telescope git_status<CR>", desc = "status" },
+      -- lsp
+      { "<leader>ds", "<cmd>Telescope lsp_document_symbols<CR>", desc = "LSP document symbols" },
+      { "<leader>ws", "<cmd>Telescope lsp_workspace_symbols<CR>", desc = "LSP workspace symbols" },
     },
   },
   {
