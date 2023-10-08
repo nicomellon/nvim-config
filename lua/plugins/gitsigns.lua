@@ -1,19 +1,31 @@
+-- Gitsigns.nvim
+-- Adds git related signs to the gutter, as well as utilities for managing changes
+
+local icons = require("config.icons")
+
 return {
-  -- Adds git related signs to the gutter, as well as utilities for managing changes
-  'lewis6991/gitsigns.nvim',
-  opts = {
-    -- See `:help gitsigns.txt`
-    signs = {
-      add = { text = '+' },
-      change = { text = '~' },
-      delete = { text = '_' },
-      topdelete = { text = '‾' },
-      changedelete = { text = '~' },
-    },
-    on_attach = function(bufnr)
-      vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk, { buffer = bufnr, desc = '[G]o to [P]revious Hunk' })
-      vim.keymap.set('n', '<leader>gn', require('gitsigns').next_hunk, { buffer = bufnr, desc = '[G]o to [N]ext Hunk' })
-      vim.keymap.set('n', '<leader>ph', require('gitsigns').preview_hunk, { buffer = bufnr, desc = '[P]review [H]unk' })
-    end,
-  },
+	"lewis6991/gitsigns.nvim",
+	opts = {
+		signs = {
+			add = { text = icons.git.added },
+			change = { text = icons.git.modified },
+			delete = { text = icons.git.removed },
+			topdelete = { text = icons.git.removed },
+			changedelete = { text = icons.git.removed },
+		},
+		on_attach = function(bufnr)
+			local gs = package.loaded.gitsigns
+
+			local function map(mode, l, r, opts)
+				opts = opts or {}
+				opts.buffer = bufnr
+				vim.keymap.set(mode, l, r, opts)
+			end
+
+			map("n", "[h", gs.prev_hunk, { desc = "Previous hunk" })
+			map("n", "]h", gs.next_hunk, { desc = "Next hunk" })
+			map("n", "<leader>hd", gs.diffthis, { desc = "Hunk diff" })
+			map("n", "<leader>hr", gs.reset_hunk, { desc = "Reset hunk" })
+		end,
+	},
 }

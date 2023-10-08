@@ -9,14 +9,14 @@ vim.g.maplocalleader = " "
 --    `:help lazy.nvim.txt` for more info
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", -- latest stable release
-    lazypath,
-  })
+	vim.fn.system({
+		"git",
+		"clone",
+		"--filter=blob:none",
+		"https://github.com/folke/lazy.nvim.git",
+		"--branch=stable", -- latest stable release
+		lazypath,
+	})
 end
 vim.opt.rtp:prepend(lazypath)
 -- start plugins
@@ -71,14 +71,63 @@ vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
+-- Keep visual selection after indenting
+vim.keymap.set("v", ">", ">gv")
+vim.keymap.set("v", "<", "<gv")
+
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
-  callback = function()
-    vim.highlight.on_yank()
-  end,
-  group = highlight_group,
-  pattern = "*",
+	callback = function()
+		vim.highlight.on_yank()
+	end,
+	group = highlight_group,
+	pattern = "*",
 })
 
+-- [[ Format the tabline ]]
+-- See `:help setting-tabline`
+local tabline_group = vim.api.nvim_create_augroup("TablineUpdate", { clear = true })
+vim.api.nvim_create_autocmd({ "TabEnter", "TabLeave" }, {
+	callback = function()
+		local s = ""
+
+		for n = 1, vim.fn.tabpagenr("$") do
+			-- select the highlighting
+			if n == vim.fn.tabpagenr() then
+				s = s .. "%#TabLineSel#"
+			else
+				s = s .. "%#TabLine#"
+			end
+
+			-- set the tab page number (for mouse clicks)
+			s = s .. "%" .. n .. "T"
+
+			-- set the text label for the tag
+			local cwd = vim.fn.getcwd()
+			local i = 0
+			while true do
+				i = string.find(cwd, "/", i + 1) -- find 'next' newline
+				if i == nil then
+					break
+				end
+				cwd = string.sub(cwd, i + 1)
+			end
+
+			s = s .. " " .. cwd .. " "
+		end
+
+		-- after the last tab fill with TabLineFill and reset tab page nr
+		s = s .. "%#TabLineFill#%T"
+
+		-- right-align the label to close the current tab page
+		if vim.fn.tabpagenr("$") > 1 then
+			s = s .. "%=%#TabLine#%999Xclose"
+		end
+
+		vim.o.tabline = s
+	end,
+	group = tabline_group,
+	pattern = "*",
+})
