@@ -13,10 +13,12 @@ return {
 				["core.dirman"] = {  -- Manages Neorg workspaces
 					config = {
 						workspaces = {
-							notes = "~/notes",
+							nester = "~/nester/notes",
 						},
+						default_workspace = "nester",
 					},
 				},
+				["core.summary"] = {}, -- Creates links and annotations to all files in a given workspace
 			},
 		})
 	end,

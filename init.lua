@@ -2,7 +2,7 @@
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+vim.g.maplocalleader = ","
 
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
@@ -93,28 +93,27 @@ vim.api.nvim_create_autocmd({ "TabEnter", "TabLeave" }, {
 	callback = function()
 		local s = ""
 
-		for n = 1, vim.fn.tabpagenr("$") do
+		for tabn = 1, vim.fn.tabpagenr("$") do
 			-- select the highlighting
-			if n == vim.fn.tabpagenr() then
+			if tabn == vim.fn.tabpagenr() then
 				s = s .. "%#TabLineSel#"
 			else
 				s = s .. "%#TabLine#"
 			end
 
 			-- set the tab page number (for mouse clicks)
-			s = s .. "%" .. n .. "T"
+			s = s .. "%" .. tabn .. "T"
 
 			-- set the text label for the tag
-			local cwd = vim.fn.getcwd()
-			local i = 0
+			local cwd = vim.fn.getcwd(-1, tabn)
 			while true do
-				i = string.find(cwd, "/", i + 1) -- find 'next' newline
-				if i == nil then
+				local i = string.find(cwd, "/", 0)
+				if i ~= nil then
+					cwd = string.sub(cwd, i + 1)
+				else
 					break
 				end
-				cwd = string.sub(cwd, i + 1)
 			end
-
 			s = s .. " " .. cwd .. " "
 		end
 

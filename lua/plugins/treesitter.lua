@@ -1,4 +1,6 @@
--- treesitter: highlight, edit, and navigate code
+-- Treesitter
+-- highlight, edit, and navigate code
+
 return {
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -63,12 +65,12 @@ return {
 						["[M"] = "@function.outer",
 						["[]"] = "@class.outer",
 					},
-					-- goto_next = {
-					--   [']i'] = "@conditional.inner",
-					-- },
-					-- goto_previous = {
-					--   ['[i'] = "@conditional.inner",
-					-- }
+					goto_next = {
+						["]i"] = "@conditional.inner",
+					},
+					goto_previous = {
+						["[i"] = "@conditional.inner",
+					},
 				},
 				swap = {
 					enable = true,
