@@ -1,4 +1,5 @@
 return {
+
 	{
 		"rebelot/kanagawa.nvim",
 		lazy = false,
@@ -8,6 +9,7 @@ return {
 			vim.cmd("colorscheme kanagawa")
 		end,
 	},
+
 	-- {
 	--   "folke/tokyonight.nvim",
 	--   lazy = false,

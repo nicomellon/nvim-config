@@ -3,26 +3,12 @@
 
 return {
 	"ThePrimeagen/harpoon",
-	opts = {
-		projects = {
-			["$HOME/nester/core"] = {
-				term = {
-					cmds = {
-						"python partisan test",
-						"python partisan test --only unit",
-						"python partisan test --only feature",
-						"python partisan test --only integration",
-					},
-				},
-			},
-		},
-	},
-	config = function(_, opts)
-		require("harpoon").setup(opts)
+	config = function()
+		require("harpoon").setup()
 
-		local function map(mode, l, r, opts_)
-			opts_ = opts_ or {}
-			vim.keymap.set(mode, l, r, opts_)
+		local function map(mode, l, r, opts)
+			opts = opts or {}
+			vim.keymap.set(mode, l, r, opts)
 		end
 
 		-- file navigation (marks)
