@@ -3,8 +3,6 @@ local icons = require("config.icons")
 -- LSP Configuration & Plugins
 return {
 
-	{ "folke/neodev.nvim" }, -- Provides useful lua config for nvim
-
 	{
 		-- Hook external tools into nvim's LSP
 		"jose-elias-alvarez/null-ls.nvim",
@@ -24,7 +22,7 @@ return {
 
 	{
 		"neovim/nvim-lspconfig",
-		dependencies = {},
+		dependencies = { "folke/neodev.nvim" }, -- Provides useful lua config for nvim,
 		config = function()
 			local lspconfig = require("lspconfig")
 			lspconfig.clangd.setup({})
@@ -53,53 +51,37 @@ return {
 					-- Enable completion triggered by <c-x><c-o>
 					vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
 
+					local function map(mode, lhs, rhs, opts)
+						opts = opts or {}
+						opts.buffer = ev.buf
+						vim.keymap.set(mode, lhs, rhs, opts)
+					end
+
 					-- Buffer local mappings.
 					-- See `:help vim.lsp.*` for documentation on any of the below functions
-					vim.keymap.set(
-						"n",
-						"gD",
-						vim.lsp.buf.declaration,
-						{ buffer = ev.buf, desc = "Lsp [G]oto [D]eclaration" }
-					)
-					vim.keymap.set(
-						"n",
-						"gd",
-						vim.lsp.buf.definition,
-						{ buffer = ev.buf, desc = "Lsp [G]oto [d]efinition" }
-					)
-					vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = ev.buf, desc = "Lsp Hover documentation" })
-					vim.keymap.set(
-						"i",
-						"<C-k>",
-						vim.lsp.buf.signature_help,
-						{ buffer = ev.buf, desc = "LSP Signature Help" }
-					)
-					vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = ev.buf, desc = "Lsp [r]e[n]ame" })
-					vim.keymap.set(
-						{ "n", "v" },
-						"<space>ca",
-						vim.lsp.buf.code_action,
-						{ buffer = ev.buf, desc = "Lsp [c]ode [a]ction" }
-					)
+					map("n", "gD", vim.lsp.buf.declaration, { desc = "Goto declaration" })
+					map("n", "gd", vim.lsp.buf.definition, { desc = "Goto definition" })
+					map("n", "K", vim.lsp.buf.hover, { desc = "Hover documentation" })
+					map("i", "<C-k>", vim.lsp.buf.signature_help, { desc = "Signature help" })
+					map("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename" })
+					map({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, { desc = "Code action" })
 
 					-- Format on save for clients that support vim.lsp.buf.format()
 					local client = vim.lsp.get_client_by_id(ev.data.client_id)
-					if not client.server_capabilities.documentFormattingProvider then
-						return
+					if client.server_capabilities.documentFormattingProvider then
+						vim.api.nvim_create_autocmd("BufWritePre", {
+							group = get_augroup(client),
+							buffer = ev.buf,
+							callback = function()
+								vim.lsp.buf.format({
+									async = false,
+									filter = function(c)
+										return c.id == client.id
+									end,
+								})
+							end,
+						})
 					end
-
-					vim.api.nvim_create_autocmd("BufWritePre", {
-						group = get_augroup(client),
-						buffer = ev.buf,
-						callback = function()
-							vim.lsp.buf.format({
-								async = false,
-								filter = function(c)
-									return c.id == client.id
-								end,
-							})
-						end,
-					})
 				end,
 			})
 
